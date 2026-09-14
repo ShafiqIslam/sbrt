@@ -1,11 +1,12 @@
 import React from 'react';
 import {Text} from 'ink';
+import {Status} from '../types.js';
 
 type Props = {
-	status: string;
+	status: Status;
 };
 
-export default function StatusTag({status}: Props) {
+export default function StatusBadge({status}: Props) {
 	switch (status) {
 		case 'RUNNING':
 			return <Text color="green">● {status}</Text>;

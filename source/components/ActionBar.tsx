@@ -1,27 +1,31 @@
 import React, {useState} from 'react';
 import {Box, Text} from 'ink';
 import TextInput from 'ink-text-input';
-
-import StatusTag from './StatusTag.js';
+import StatusBadge from './StatusBadge.js';
+import {ACTION_KEYS, ACTIONS} from '../consts.js';
+import {RestartMode, Status} from '../types.js';
+import RestartModeBadge from './RestartModeBadge.js';
 
 type Props = {
-	actions: {key: string; label: string}[];
-	status: string;
+	showingHelp: boolean;
+	status: Status;
 	onSearch: (query: string) => void;
 	searching: boolean;
 	isSearchApplied: boolean;
 	searchQuery: string | undefined;
 	stopSearch: () => void;
+	restartMode: RestartMode;
 };
 
 export default function ActionBar({
-	actions,
+	showingHelp,
 	status,
 	onSearch,
 	searching,
 	isSearchApplied,
 	searchQuery,
 	stopSearch,
+	restartMode,
 }: Props) {
 	const [query, setQuery] = useState('');
 
@@ -30,6 +34,22 @@ export default function ActionBar({
 		stopSearch();
 		setQuery('');
 	};
+
+	const actions = ACTIONS.filter(action => {
+		if (showingHelp) {
+			return action.inHelpMode;
+		}
+
+		if (!action.inLogMode) {
+			return false;
+		}
+
+		if (action.key !== ACTION_KEYS.restart) {
+			return true;
+		}
+
+		return restartMode === 'MANUAL';
+	});
 
 	return (
 		<Box
@@ -40,8 +60,10 @@ export default function ActionBar({
 			borderRight={false}
 			alignItems="center"
 		>
-			<Box width={20} paddingLeft={1}>
-				<StatusTag status={status} />
+			<Box paddingLeft={1}>
+				<StatusBadge status={status} />
+				<Box marginX={1}></Box>
+				<RestartModeBadge mode={restartMode} />
 			</Box>
 
 			<Box flexGrow={1} justifyContent="center">
@@ -81,7 +103,7 @@ export default function ActionBar({
 						{isSearchApplied ? (
 							<Text>{searchQuery}</Text>
 						) : (
-							<Text dimColor>Press / to search</Text>
+							<Text dimColor>Press {ACTION_KEYS.search} to search</Text>
 						)}
 					</>
 				)}

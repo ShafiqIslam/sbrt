@@ -1,9 +1,11 @@
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useApp, useStdout} from 'ink';
 
-export function useTerminal(stopped: boolean) {
+export function useTerminal() {
 	const {stdout} = useStdout();
 	const {exit} = useApp();
+
+	const [quitByUser, setQuitByUser] = useState(false);
 
 	const cleanup = useCallback(() => {
 		// Clear screen
@@ -29,16 +31,21 @@ export function useTerminal(stopped: boolean) {
 	const logHeight = Math.max(1, terminalHeight - actionBarHeight);
 
 	useEffect(() => {
-		if (!stopped) return;
+		if (!quitByUser) return;
 
 		exit();
 		cleanup();
-	}, [stopped, cleanup, exit]);
+	}, [quitByUser, cleanup, exit]);
+
+	const quitApp = useCallback(() => {
+		setQuitByUser(true);
+	}, [setQuitByUser]);
 
 	return {
 		cleanup,
 		terminalHeight,
 		actionBarHeight,
 		logHeight,
+		quitApp,
 	};
 }

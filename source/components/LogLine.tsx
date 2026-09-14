@@ -1,7 +1,20 @@
 import React from 'react';
 import {Text} from 'ink';
+import {LOG_LEVEL_COLOR, SBRT_LOG_PREFIX} from '../consts.js';
 
-export default function LogLine({line}: {line: string}) {
+type Props = {
+	line: string;
+};
+
+export default function LogLine({line}: Props) {
+	if (line.startsWith(SBRT_LOG_PREFIX)) {
+		return (
+			<Text color="cyan" bold wrap="truncate-end">
+				{line}
+			</Text>
+		);
+	}
+
 	const match = line.match(/\b(TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\b/);
 
 	if (!match || match.index === undefined) {
@@ -12,20 +25,10 @@ export default function LogLine({line}: {line: string}) {
 	const level = match[1] ?? '';
 	const after = line.slice(match.index + level.length);
 
-	const levelColor: Record<string, string> = {
-		TRACE: 'gray',
-		DEBUG: 'blue',
-		INFO: 'green',
-		WARN: 'yellow',
-		WARNING: 'yellow',
-		ERROR: 'red',
-		FATAL: 'red',
-	};
-
 	return (
 		<Text wrap="truncate-end">
 			{before}
-			<Text color={level == '' ? 'white' : levelColor[level]} bold>
+			<Text color={level == '' ? 'white' : LOG_LEVEL_COLOR[level]} bold>
 				{level}
 			</Text>
 			{after}
