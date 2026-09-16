@@ -17,12 +17,18 @@ type Props = {
 
 export default function App({readme, config}: Props) {
 	const {terminalHeight, logHeight, quitApp} = useTerminal();
+
 	const {restartMode, triggerFile} = useSpringDevTools();
-	const {logs, status, restart, cleanRestart, stop, clearLogs} = useSpringBoot(
-		restartMode,
-		triggerFile,
-		config,
-	);
+	const {
+		logs,
+		status,
+		restart,
+		cleanRestart,
+		stop,
+		clearLogs,
+		addNewLineInLog,
+	} = useSpringBoot(restartMode, triggerFile, config);
+
 	const {filteredLogs, handleSearch, searchQuery, isSearchApplied} =
 		useLogs(logs);
 
@@ -33,6 +39,7 @@ export default function App({readme, config}: Props) {
 		onClear: clearLogs,
 		onRestart: restart,
 		onCleanRestart: cleanRestart,
+		onNewLine: addNewLineInLog,
 		isSearchApplied,
 		handleSearch,
 		restartMode,

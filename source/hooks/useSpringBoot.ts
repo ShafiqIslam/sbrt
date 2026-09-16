@@ -27,8 +27,15 @@ export function useSpringBoot(
 	const addUserLogs = useCallback(
 		(...lines: string[]) => {
 			const separator =
-				'=============================================================================';
-			const newLines = [separator, ...lines, separator];
+				'============================================================================================================================================================================';
+
+			const newLines = [
+				separator,
+				...lines.map(l => {
+					return `${new Date().toISOString()} ${l}`;
+				}),
+				separator,
+			];
 			addLogs(...newLines.map(line => `${SBRT_LOG_PREFIX} ${line}`));
 		},
 		[addLogs],
@@ -53,7 +60,11 @@ export function useSpringBoot(
 
 		const child = spawn(
 			'./mvnw',
-			['spring-boot:run', `-Dspring-boot.run.jvmArguments=${jvmArguments}`],
+			[
+				'spring-boot:run',
+				'-Dmaven.test.skip=true',
+				`-Dspring-boot.run.jvmArguments=${jvmArguments}`,
+			],
 			{
 				cwd: process.cwd(),
 				stdio: ['ignore', 'pipe', 'pipe'],
@@ -210,9 +221,13 @@ export function useSpringBoot(
 		start();
 	}, [addUserLogs, clean, start, stopAndWait]);
 
-	const clearLogs = () => {
+	const clearLogs = useCallback(() => {
 		setLogs([]);
-	};
+	}, [setLogs]);
+
+	const addNewLineInLog = useCallback(() => {
+		addLogs('    ');
+	}, [addLogs]);
 
 	return {
 		logs,
@@ -221,5 +236,6 @@ export function useSpringBoot(
 		restart,
 		cleanRestart,
 		clearLogs,
+		addNewLineInLog,
 	};
 }

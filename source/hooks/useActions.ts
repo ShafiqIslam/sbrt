@@ -8,6 +8,7 @@ type UseActionsOptions = {
 	onClear: () => void;
 	onRestart: () => void;
 	onCleanRestart: () => void;
+	onNewLine: () => void;
 	restartMode: RestartMode;
 	isSearchApplied: boolean;
 	handleSearch: (searchQuery: string) => void;
@@ -18,6 +19,7 @@ export function useActions({
 	onClear,
 	onRestart,
 	onCleanRestart,
+	onNewLine,
 	handleSearch,
 	isSearchApplied,
 	restartMode,
@@ -67,6 +69,11 @@ export function useActions({
 			return;
 		}
 
+		if (key.return) {
+			onNewLine();
+			return;
+		}
+
 		switch (input) {
 			case ACTION_KEYS.search:
 				startSearch();
@@ -79,6 +86,9 @@ export function useActions({
 				break;
 			case ACTION_KEYS.restart:
 				restart();
+				break;
+			case ACTION_KEYS.cleanRestart:
+				onCleanRestart();
 				break;
 			case ACTION_KEYS.cleanRestart:
 				onCleanRestart();

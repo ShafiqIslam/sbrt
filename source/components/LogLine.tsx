@@ -14,24 +14,50 @@ export default function LogLine({line}: Props) {
 			</Text>
 		);
 	}
+	const match = line.match(
+		/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(\[[^\]]+\])\s+\b(TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\b/,
+	);
 
-	const match = line.match(/\b(TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\b/);
+	const getNodeForJustText = (text: string) => {
+		const matchLevelOnText = text.match(
+			/\b(TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\b/,
+		);
 
-	if (!match || match.index === undefined) {
-		return <Text wrap="truncate-end">{line}</Text>;
+		if (!matchLevelOnText || matchLevelOnText.index === undefined) {
+			return text;
+		}
+
+		const before = line.slice(0, matchLevelOnText.index);
+		const level = matchLevelOnText[1] ?? '';
+		const after = line.slice(matchLevelOnText.index + level.length);
+
+		return (
+			<>
+				{before}
+				<Text color={level == '' ? 'white' : LOG_LEVEL_COLOR[level]} bold>
+					{level}
+				</Text>
+				{after}
+			</>
+		);
+	};
+
+	if (!match) {
+		return <Text wrap="truncate-end">{getNodeForJustText(line)}</Text>;
 	}
-
-	const before = line.slice(0, match.index);
-	const level = match[1] ?? '';
-	const after = line.slice(match.index + level.length);
+	const [, timestamp, thread, level] = match;
+	const prefixEnd = match[0].length;
+	const rest = line.slice(prefixEnd);
 
 	return (
 		<Text wrap="truncate-end">
-			{before}
-			<Text color={level == '' ? 'white' : LOG_LEVEL_COLOR[level]} bold>
-				{level}
-			</Text>
-			{after}
+			{' '}
+			<Text color="magenta">{timestamp}</Text> <Text dimColor>{thread}</Text>{' '}
+			<Text color={!level ? 'white' : LOG_LEVEL_COLOR[level]} bold>
+				{' '}
+				{level}{' '}
+			</Text>{' '}
+			{getNodeForJustText(rest)}{' '}
 		</Text>
 	);
 }

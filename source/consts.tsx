@@ -53,7 +53,7 @@ export const RESTART_MODE_COLORS: Record<RestartMode, string> = {
 
 export const DEFAULT_RESOURCE_CONFIG: ResourceConfig = {
 	java: {
-		initialMemoryMb: 512,
-		maxMemoryMb: 2048,
+		initialMemoryMb: 256,
+		maxMemoryMb: 512,
 	},
 };
